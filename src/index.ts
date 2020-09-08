@@ -12,7 +12,7 @@ class Block {
     previousHash: string,
     timestamp: number,
     data: string
-  ): string => CrytoJS.SHA256(index + previousHash + timestamp + data);
+  ): string => CrytoJS.SHA256(index + previousHash + timestamp + data).toString();
 
   static validateStructure = (aBlock: Block): boolean =>
     typeof aBlock.index === "number" &&
@@ -45,7 +45,7 @@ const getHashForBlock = (aBlock: Block): string =>
   );
 
 const isBlockValid = (candidateBlock: Block, previousBlock: Block): boolean => {
-  if (Block.validateStructure(candidateBlock)) {
+  if (!Block.validateStructure(candidateBlock)) {
     return false;
   } else if (previousBlock.index + 1 !== candidateBlock.index) {
     return false;
@@ -60,12 +60,11 @@ const isBlockValid = (candidateBlock: Block, previousBlock: Block): boolean => {
 
 const addBlock = (candidateBlock: Block): void => {
   if (isBlockValid(candidateBlock, getLatestBlock())) {
-    blockchain.push(candidateBlock);
+    getBlockChain().push(candidateBlock);
   }
 };
 
 const genesisBlcok: Block = new Block(0, "123123", "", "Hello", 123456);
-
 let blockchain: Block[] = [genesisBlcok];
 
 const getBlockChain = (): Block[] => blockchain;
@@ -84,6 +83,7 @@ const createNewBlock = (data: string): Block => {
     newTimestamp,
     data
   );
+
   const newBlock: Block = new Block(
     newIndex,
     newHash,
@@ -91,10 +91,14 @@ const createNewBlock = (data: string): Block => {
     data,
     newTimestamp
   );
-  blockchain.push(newBlock);
+  addBlock(newBlock);
+
   return newBlock;
 };
 
-console.log(createNewBlock("hello"), createNewBlock("bye bye"));
+createNewBlock("hello");
+createNewBlock("coding");
+createNewBlock("bye bye");
+console.log(getBlockChain());
 
 export {};
